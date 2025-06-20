@@ -225,24 +225,32 @@ class WeatherService {
       if (!daily[day]) daily[day] = [];
       daily[day].push(item);
     });
-    const result = Object.values(daily).slice(0, 10).map((items: any[]) => {
-      const mid = Math.floor(items.length / 2);
-      const item = items[mid];
-      const temps = items.map(i => i.main.temp);
-      const min = Math.min(...temps);
-      const max = Math.max(...temps);
-      const condition = this.mapWeatherCondition(item.weather[0].main);
-      return {
-        date: new Date(item.dt * 1000),
-        temperature: { min: Math.round(min), max: Math.round(max) },
-        condition,
-        description: this.getWeatherDescription(condition, language),
-        humidity: item.main.humidity,
-        windSpeed: Math.round(item.wind.speed * 3.6),
-        precipitation: item.rain ? Math.round(item.rain['3h'] || 0) : 0,
-        icon: this.getWeatherIcon(condition),
-      };
-    });
+    // Lấy ngày hiện tại theo múi giờ Việt Nam
+    const now = new Date();
+    const vnDate = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    const todayStr = vnDate.toISOString().split('T')[0];
+    // Bỏ qua ngày hôm nay, chỉ lấy từ ngày mai trở đi
+    const result = Object.entries(daily)
+      .filter(([day]) => day > todayStr)
+      .slice(0, 10)
+      .map(([, items]: any[]) => {
+        const mid = Math.floor(items.length / 2);
+        const item = items[mid];
+        const temps = items.map((i: any) => i.main.temp);
+        const min = Math.min(...temps);
+        const max = Math.max(...temps);
+        const condition = this.mapWeatherCondition(item.weather[0].main);
+        return {
+          date: new Date(item.dt * 1000),
+          temperature: { min: Math.round(min), max: Math.round(max) },
+          condition,
+          description: this.getWeatherDescription(condition, language),
+          humidity: item.main.humidity,
+          windSpeed: Math.round(item.wind.speed * 3.6),
+          precipitation: item.rain ? Math.round(item.rain['3h'] || 0) : 0,
+          icon: this.getWeatherIcon(condition),
+        };
+      });
     console.log('[DEBUG] Transformed ForecastData:', result);
     return result;
   }
