@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .weather-card {
+    @apply glass-effect rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
