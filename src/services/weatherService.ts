@@ -17,6 +17,34 @@ declare global {
 
 console.log('[DEBUG] VITE_OPENWEATHER_API_KEY:', API_KEY);
 
+// Bổ sung hàm mapCityName để chuyển tên tiếng Việt có dấu sang tiếng Anh không dấu
+const cityNameMap: Record<string, string> = {
+  'Thành phố Hồ Chí Minh': 'Ho Chi Minh City',
+  'Hà Nội': 'Hanoi',
+  'Đà Nẵng': 'Da Nang',
+  'Hải Phòng': 'Hai Phong',
+  'Cần Thơ': 'Can Tho',
+  'Biên Hòa': 'Bien Hoa',
+  'Huế': 'Hue',
+  'Nha Trang': 'Nha Trang',
+  'Buôn Ma Thuột': 'Buon Ma Thuot',
+  'Quy Nhơn': 'Quy Nhon',
+  'Vũng Tàu': 'Vung Tau',
+  'Thái Nguyên': 'Thai Nguyen',
+  'Long Xuyên': 'Long Xuyen',
+  'Thanh Hóa': 'Thanh Hoa',
+  'Thái Bình': 'Thai Binh',
+  'Nam Định': 'Nam Dinh',
+  'Phan Thiết': 'Phan Thiet',
+  'Cam Ranh': 'Cam Ranh',
+  'Vinh': 'Vinh',
+  'Mỹ Tho': 'My Tho',
+};
+
+function mapCityName(cityName: string): string {
+  return cityNameMap[cityName] || cityName;
+}
+
 class WeatherService {
   private generateMockWeatherData(cityName: string, language: 'en' | 'vi' = 'en'): WeatherData {
     const city = vietnameseCities.find(c => c.name.toLowerCase() === cityName.toLowerCase()) 
@@ -221,7 +249,8 @@ class WeatherService {
 
   async getCurrentWeather(cityName: string, language: 'en' | 'vi' = 'en'): Promise<WeatherData> {
     try {
-      const url = `${BASE_URL}/weather?q=${encodeURIComponent(cityName)},VN&appid=${API_KEY}&units=metric&lang=${language}`;
+      const mappedCity = mapCityName(cityName);
+      const url = `${BASE_URL}/weather?q=${encodeURIComponent(mappedCity)},VN&appid=${API_KEY}&units=metric&lang=${language}`;
       const data = await this.fetchWeatherApi(url);
       console.log('[DEBUG] CurrentWeather API data:', data);
       const result = this.transformWeatherData(data, language);
@@ -234,7 +263,8 @@ class WeatherService {
 
   async getForecast(cityName: string, days: number = 10, language: 'en' | 'vi' = 'en'): Promise<ForecastData[]> {
     try {
-      const url = `${BASE_URL}/forecast?q=${encodeURIComponent(cityName)},VN&appid=${API_KEY}&units=metric&lang=${language}`;
+      const mappedCity = mapCityName(cityName);
+      const url = `${BASE_URL}/forecast?q=${encodeURIComponent(mappedCity)},VN&appid=${API_KEY}&units=metric&lang=${language}`;
       const data = await this.fetchWeatherApi(url);
       console.log('[DEBUG] Forecast API data:', data);
       const result = this.transformForecastData(data, language).slice(0, days);
